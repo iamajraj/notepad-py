@@ -17,6 +17,8 @@ class Notepad(QMainWindow):
         self.text_edit.setStyleSheet(f"font-size: {self.font_size}px; border-top: 1px solid #dbdbd9;")
         self.setCentralWidget(self.text_edit)
         self.text_edit.installEventFilter(self)
+        self.text_edit.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.text_edit.customContextMenuRequested.connect(self.show_context_menu)
 
         self.status_bar = self.statusBar()
         self.info_label = QLabel()
@@ -112,6 +114,11 @@ class Notepad(QMainWindow):
 
         info_text = f"Line: {line}  |  Col: {col}  |  Words: {word_count}  |  Chars: {char_count}"
         self.info_label.setText(info_text)
+    
+    def show_context_menu(self, position):
+        context_menu = self.text_edit.createStandardContextMenu()
+        context_menu.setStyleSheet("font-size: 14px;")
+        context_menu.exec_(self.text_edit.mapToGlobal(position))
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.Wheel and source is self.text_edit:
