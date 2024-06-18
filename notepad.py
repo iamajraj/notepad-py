@@ -22,6 +22,10 @@ class Notepad(QMainWindow):
         self.info_label = QLabel()
         self.status_bar.addWidget(self.info_label, 1)
 
+        self.github_label = QLabel('<a href="https://github.com/iamajraj" style="color: black;">GitHub</a>')
+        self.github_label.setOpenExternalLinks(True)
+        self.status_bar.addPermanentWidget(self.github_label)
+
         self.update_info_timer = QTimer(self)
         self.update_info_timer.timeout.connect(self.update_info)
         self.update_info_timer.start(200)
@@ -120,6 +124,7 @@ class Notepad(QMainWindow):
                 self.font_size = max(1, self.font_size)
                 font.setPointSize(self.font_size)
                 self.text_edit.setFont(font)
+                self.text_edit.setStyleSheet(f"font-size: {self.font_size}px; border-top:1px solid #dbdbd9;")
                 return True
         return super().eventFilter(source, event)
 
