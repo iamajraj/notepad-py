@@ -1,5 +1,6 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QAction, QFileDialog, QMessageBox, QLabel, QStatusBar
+import os
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QAction, QFileDialog, QMessageBox, QLabel, QStatusBar, QVBoxLayout, QDialog
 from PyQt5.QtCore import Qt, QTimer, QObject, QEvent
 
 class Notepad(QMainWindow):
@@ -64,6 +65,13 @@ class Notepad(QMainWindow):
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
 
+        # Help menu
+        help_menu = menubar.addMenu('Help')
+
+        about_action = QAction('About Us', self)
+        about_action.triggered.connect(self.show_about_dialog)
+        help_menu.addAction(about_action)
+
     def new_file(self):
         self.text_edit.clear()
         self.current_file = None
@@ -74,18 +82,21 @@ class Notepad(QMainWindow):
             self.current_file = filename
             with open(filename, 'r') as file:
                 self.text_edit.setPlainText(file.read())
+            self.update_window_title()
 
     def save_file(self):
         if self.current_file:
             self.save_to_file(self.current_file)
         else:
             self.save_as_file()
+        self.update_window_title()
 
     def save_as_file(self):
         filename, _ = QFileDialog.getSaveFileName(self, 'Save File', '', 'Text Files (*.txt);;All Files (*.*)')
         if filename:
             self.current_file = filename
             self.save_to_file(filename)
+            self.update_window_title()
 
     def save_to_file(self, filename):
         with open(filename, 'w') as file:
@@ -100,6 +111,34 @@ class Notepad(QMainWindow):
                 self.save_file()
             elif reply == QMessageBox.Cancel:
                 event.ignore()
+
+    def show_about_dialog(self):
+        about_dialog = QDialog(self)
+        about_dialog.setWindowTitle('About Us')
+        about_dialog.setGeometry(200, 200, 400, 200)
+
+        layout = QVBoxLayout()
+
+        about_text = QLabel()
+        about_text.setTextFormat(Qt.RichText)
+        about_text.setText(
+            "This is a simple notepad application.<br><br>"
+            "Developed by Md. Akmal Hossain Raj.<br><br>"
+            "GitHub: <a href='https://github.com/iamajraj'>https://github.com/iamajraj</a><br>"
+            "Portfolio: <a href='https://raajx.com'>https://raajx.com</a>"
+        )
+        about_text.setOpenExternalLinks(True)
+        layout.addWidget(about_text)
+
+        about_dialog.setLayout(layout)
+        about_dialog.exec_()
+
+    def update_window_title(self):
+        if self.current_file:
+            filename = os.path.basename(self.current_file)
+            self.setWindowTitle(f"Notepad - {filename}")
+        else:
+            self.setWindowTitle("Notepad")
 
     def update_info(self):
         cursor = self.text_edit.textCursor()
